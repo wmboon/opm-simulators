@@ -477,6 +477,20 @@ public:
             porosity_ *= (1.0 - Sp);
         }
 
+        Scalar rockBiot = problem.rockBiotComp(globalSpaceIdx);
+        if (rockBiot > 0.0) {
+            Scalar rockRefPressure = problem.rockReferencePressure(globalSpaceIdx);
+            Evaluation active_pressure;
+            if (FluidSystem::phaseIsActive(oilPhaseIdx)) {
+                active_pressure = fluidState_.pressure(oilPhaseIdx) - rockRefPressure;
+            } else if (FluidSystem::phaseIsActive(waterPhaseIdx)){
+                active_pressure = fluidState_.pressure(waterPhaseIdx) - rockRefPressure;
+            } else {
+                active_pressure = fluidState_.pressure(gasPhaseIdx) - rockRefPressure;
+            }
+            porosity_ += rockBiot*active_pressure;
+        }
+
         rockCompTransMultiplier_ = problem.template rockCompTransMultiplier<Evaluation>(*this, globalSpaceIdx);
 
         asImp_().solventPvtUpdate_(elemCtx, dofIdx, timeIdx);

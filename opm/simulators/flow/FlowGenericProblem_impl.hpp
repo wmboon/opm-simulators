@@ -314,6 +314,17 @@ rockFraction(unsigned elementIdx, unsigned timeIdx) const
 }
 
 template<class GridView, class FluidSystem>
+typename FlowGenericProblem<GridView,FluidSystem>::Scalar
+FlowGenericProblem<GridView,FluidSystem>::
+rockBiotComp(unsigned elementIdx) const
+{
+    // the additional compressibility of the rock due to Biot poroelasticity
+    if (!eclState_.fieldProps().has_double("ROCKBIOT"))
+        return 0.0;
+    return this->lookUpData_.fieldPropDouble(eclState_.fieldProps(), "ROCKBIOT", elementIdx);
+}
+
+template<class GridView, class FluidSystem>
 template<class T>
 void FlowGenericProblem<GridView,FluidSystem>::
 updateNum(const std::string& name, std::vector<T>& numbers, std::size_t num_regions)
