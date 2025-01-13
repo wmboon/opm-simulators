@@ -172,6 +172,7 @@ public:
     using BaseType::shouldWriteOutput;
     using BaseType::shouldWriteRestartFile;
     using BaseType::rockCompressibility;
+    using BaseType::rockBiotComp;
     using BaseType::porosity;
 
     /*!
@@ -687,6 +688,16 @@ public:
     {
         unsigned globalSpaceIdx = context.globalSpaceIndex(spaceIdx, timeIdx);
         return this->rockCompressibility(globalSpaceIdx);
+    }
+
+    /*!
+     * \copydoc BlackoilProblem::rockBiotComp
+     */
+    template <class Context>
+    Scalar rockBiotComp(const Context& context, unsigned spaceIdx, unsigned timeIdx) const
+    {
+        unsigned globalSpaceIdx = context.globalSpaceIndex(spaceIdx, timeIdx);
+        return this->rockBiotComp(globalSpaceIdx);
     }
 
     /*!
