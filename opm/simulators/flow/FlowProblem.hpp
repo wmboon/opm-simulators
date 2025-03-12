@@ -1123,7 +1123,7 @@ public:
         const bool implicit = !this->explicitRockCompaction_;
         double trans_mult = implicit ? this->simulator().problem().template computeRockCompTransMultiplier_<double>(intQuants, elementIdx)
                                      : this->simulator().problem().getRockCompTransMultVal(elementIdx);
-        trans_mult *= this->simulator().problem().template permFactTransMultiplier<double>(intQuants);
+        trans_mult *= this->simulator().problem().template permFactTransMultiplier<double>(intQuants, elementIdx);
     
         return trans_mult;
     }
