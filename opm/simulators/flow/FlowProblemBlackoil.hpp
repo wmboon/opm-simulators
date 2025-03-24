@@ -606,7 +606,7 @@ public:
                 if (!FluidSystem::phaseIsActive(phaseIdx)) {
                     continue;
                 }
-                Scalar mass_rate = source.rate({ijk, sourceComp}) / this->model().dofTotalVolume(globalDofIdx);
+                Scalar mass_rate = source.rate(ijk, sourceComp) / this->model().dofTotalVolume(globalDofIdx);
                 if constexpr (getPropValue<TypeTag, Properties::BlackoilConserveSurfaceVolume>()) {
                     mass_rate /= FluidSystem::referenceDensity(phaseIdx, pvtRegionIdx);
                 }
@@ -614,7 +614,7 @@ public:
             }
 
             if constexpr (enableSolvent) {
-                Scalar mass_rate = source.rate({ijk, SourceComponent::SOLVENT}) / this->model().dofTotalVolume(globalDofIdx);
+                Scalar mass_rate = source.rate(ijk, SourceComponent::SOLVENT) / this->model().dofTotalVolume(globalDofIdx);
                 if constexpr (getPropValue<TypeTag, Properties::BlackoilConserveSurfaceVolume>()) {
                     const auto& solventPvt = SolventModule::solventPvt();
                     mass_rate /= solventPvt.referenceDensity(pvtRegionIdx);
@@ -632,17 +632,17 @@ public:
                     }
                     const auto sourceComp = sc_map[i];
                     if (source.hasHrate({ijk, sourceComp})) {
-                        rate[Indices::contiEnergyEqIdx] += source.hrate({ijk, sourceComp}) / this->model().dofTotalVolume(globalDofIdx);
+                        rate[Indices::contiEnergyEqIdx] += source.hrate(ijk, sourceComp) / this->model().dofTotalVolume(globalDofIdx);
                     } else {
                         const auto& intQuants = this->simulator().model().intensiveQuantities(globalDofIdx, /*timeIdx*/ 0);
                         auto fs = intQuants.fluidState();
                         // if temperature is not set, use cell temperature as default
                         if (source.hasTemperature({ijk, sourceComp})) {
-                            Scalar temperature = source.temperature({ijk, sourceComp});
+                            Scalar temperature = source.temperature(ijk, sourceComp);
                             fs.setTemperature(temperature);
                         }
                         const auto& h = FluidSystem::enthalpy(fs, phaseIdx, pvtRegionIdx);
-                        Scalar mass_rate = source.rate({ijk, sourceComp})/ this->model().dofTotalVolume(globalDofIdx);
+                        Scalar mass_rate = source.rate(ijk, sourceComp)/ this->model().dofTotalVolume(globalDofIdx);
                         Scalar energy_rate = getValue(h)*mass_rate;
                         rate[Indices::contiEnergyEqIdx] += energy_rate;
                     }
