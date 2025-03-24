@@ -622,7 +622,7 @@ public:
                 rate[Indices::contiSolventEqIdx] += mass_rate;
             }
             if constexpr (enablePolymer) {
-                rate[Indices::polymerConcentrationIdx] += source.rate({ijk, SourceComponent::POLYMER}) / this->model().dofTotalVolume(globalDofIdx);
+                rate[Indices::polymerConcentrationIdx] += source.rate(ijk, SourceComponent::POLYMER) / this->model().dofTotalVolume(globalDofIdx);
             }
             if constexpr (enableEnergy) {
                 for (unsigned i = 0; i < phidx_map.size(); ++i) {
@@ -631,21 +631,21 @@ public:
                         continue;
                     }
                     const auto sourceComp = sc_map[i];
-                    if (source.hasHrate({ijk, sourceComp})) {
+                    // if (source.hasHrate({ijk, sourceComp})) {
                         rate[Indices::contiEnergyEqIdx] += source.hrate(ijk, sourceComp) / this->model().dofTotalVolume(globalDofIdx);
-                    } else {
+                    // } else {
                         const auto& intQuants = this->simulator().model().intensiveQuantities(globalDofIdx, /*timeIdx*/ 0);
                         auto fs = intQuants.fluidState();
                         // if temperature is not set, use cell temperature as default
-                        if (source.hasTemperature({ijk, sourceComp})) {
-                            Scalar temperature = source.temperature(ijk, sourceComp);
-                            fs.setTemperature(temperature);
-                        }
+                        // if (source.hasTemperature({ijk, sourceComp})) {
+                        Scalar temperature = source.temperature(ijk, sourceComp);
+                        fs.setTemperature(temperature);
+                        // }
                         const auto& h = FluidSystem::enthalpy(fs, phaseIdx, pvtRegionIdx);
                         Scalar mass_rate = source.rate(ijk, sourceComp)/ this->model().dofTotalVolume(globalDofIdx);
                         Scalar energy_rate = getValue(h)*mass_rate;
                         rate[Indices::contiEnergyEqIdx] += energy_rate;
-                    }
+                    // }
                 }
             }
         }
