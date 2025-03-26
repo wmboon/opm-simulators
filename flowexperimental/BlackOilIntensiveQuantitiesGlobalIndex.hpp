@@ -54,6 +54,7 @@
 
 #include <opm/utility/CopyablePtr.hpp>
 
+#include <stdexcept>
 #include <utility>
 
 #include <fmt/format.h>
