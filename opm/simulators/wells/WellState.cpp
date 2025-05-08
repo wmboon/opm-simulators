@@ -673,6 +673,7 @@ void WellState<Scalar>::initWellStateMSWell(const std::vector<Well>& wells_ecl,
 
     std::optional<std::string> distributedMSWellLocalErrorMessage;
     std::optional<std::string> connectionWithoutAssociatedSegmentsLocalErrorMessage;
+    std::optional<std::string> initializePerforationMismatchLocalErrorMessage;
 
     // in the init function, the well rates and perforation rates have been initialized or copied from prevState
     // what we do here, is to set the segment rates and perforation rates
@@ -800,7 +801,12 @@ void WellState<Scalar>::initWellStateMSWell(const std::vector<Well>& wells_ecl,
                         perforation_rates[global_active_perf_index * np + i] = perf_rates[perf * np + i];
                     }
                 } else {
-                    OPM_THROW(std::logic_error,fmt::format("Error when initializing MS Well state, there is no active perforation index for the local index {}", perf));
+                    if (!initializePerforationMismatchLocalErrorMessage) {
+                        initializePerforationMismatchLocalErrorMessage = ""; // First well with error: initialize the string
+                    }
+
+                    // Append to the existing error message for errors in further wells
+                    *initializePerforationMismatchLocalErrorMessage += fmt::format("Error when initializing MS Well state of well {}, there is no active perforation index for the local index {}.\n", well_ecl.name(), perf);
                 }
             }
             if (ws.parallel_info.get().communication().size() > 1) {
@@ -850,6 +856,10 @@ void WellState<Scalar>::initWellStateMSWell(const std::vector<Well>& wells_ecl,
 
         if (connectionWithoutAssociatedSegmentsLocalErrorMessage) {
             fullErrorMessage += *connectionWithoutAssociatedSegmentsLocalErrorMessage;
+        }
+
+        if (initializePerforationMismatchLocalErrorMessage) {
+            fullErrorMessage += *initializePerforationMismatchLocalErrorMessage;
         }
 
         if (!fullErrorMessage.empty()) {
