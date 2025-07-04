@@ -742,7 +742,7 @@ public:
 
         // update extBO parameters
         if constexpr (enableExtbo) {
-                // TODO: asImp_().zFractionUpdate_(elemCtx, dofIdx, timeIdx);
+            asImp_().zFractionUpdate_(priVars, timeIdx);
         }
 
         updateRsRvRsw(problem, priVars, globalSpaceIdx, timeIdx);
